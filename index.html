@@ -3,13 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Torneo — Partidos 5 vs 5</title>
+  <title>Torneo Anual — Sistema de Ascensos</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
-    <h1>Torneo — Partidos 5 vs 5</h1>
+    <h1>Torneo Anual — Sistema de Ascensos</h1>
     <div class="header-right">
+      <span id="currentYear">2025</span>
+      <button id="prevYearBtn">←</button>
+      <button id="nextYearBtn">→</button>
       <span id="modeBadge">Modo: Público</span>
       <button id="loginBtn">Ingresar admin</button>
     </div>
@@ -18,7 +21,7 @@
   <main class="layout">
     <aside class="controls">
       <section class="card admin-only" id="adminPanel">
-        <h2>Panel Administrador</h2>
+        <h2>Panel Administrador <span id="currentYearBadge">2025</span></h2>
 
         <!-- Agregar Jugador -->
         <div class="form-column">
@@ -68,26 +71,38 @@
             <button onclick="document.getElementById('importBtn').click()">Importar datos</button>
           </div>
           <div class="form-row">
-            <button id="resetAllBtn" class="danger">Resetear todo</button>
+            <button id="resetYearBtn" class="danger">Resetear año actual</button>
           </div>
         </div>
       </section>
 
       <section class="card">
-        <h2>Información</h2>
-        <p>Los partidos son 5 vs 5. Seleccioná 5 jugadores para cada equipo.</p>
-        <p>Solo los administradores pueden registrar nuevos partidos.</p>
+        <h2>Información del Sistema</h2>
+        <p><strong>Sistema de Ascensos:</strong></p>
+        <ul>
+          <li>✅ Ganas = Avanzas de fase</li>
+          <li>❌ Pierdes = Vuelves a Grupos</li>
+          <li>🏆 Mundial MG = Partidos ganados en fases eliminatorias</li>
+        </ul>
+        <p><strong>Jugadores:</strong> 13 jugadores (12 predeterminados + agregar)</p>
       </section>
     </aside>
 
     <section class="content">
       <!-- Tabla de Jugadores -->
       <div class="card standingsCard">
-        <h2>Tabla de Posiciones - Jugadores</h2>
+        <h2>Tabla de Posiciones - Mundial <span id="currentYearTable">2025</span></h2>
         <table id="playersTable">
           <thead>
             <tr>
-              <th>#</th><th>Jugador</th><th>PJ</th><th>PG</th><th>PP</th><th>Puntos</th>
+              <th>#</th>
+              <th>Jugador</th>
+              <th>PJ</th>
+              <th>PG</th>
+              <th>PP</th>
+              <th>Puntos</th>
+              <th>Mundial MG</th>
+              <th>Fase Actual</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -96,8 +111,14 @@
 
       <!-- Historial -->
       <div class="card historyCard">
-        <h2>Historial de Partidos</h2>
+        <h2>Historial de Partidos - <span id="historyYear">2025</span></h2>
         <ul id="historyList"></ul>
+      </div>
+
+      <!-- Ganadores por Año -->
+      <div class="card worldcup-card">
+        <h2>🏆 Campeones por Año</h2>
+        <div id="winnersList" class="winners-grid"></div>
       </div>
     </section>
   </main>
@@ -115,7 +136,7 @@
   </div>
 
   <footer>
-    <small>Sistema de gestión de torneos 5 vs 5 — Datos locales</small>
+    <small>Sistema de torneos anuales con ascensos — Datos locales</small>
   </footer>
 
   <script src="script.js"></script>

@@ -5,6 +5,9 @@
   --danger: #e04b4b;
   --success: #28a745;
   --warning: #ffc107;
+  --gold: #ffd700;
+  --silver: #c0c0c0;
+  --bronze: #cd7f32;
   --muted: #666;
   font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
 }
@@ -38,6 +41,14 @@ header h1 { margin: 0; font-size: 1.1rem; }
   background: var(--accent);
   color: #fff;
   cursor: pointer;
+  font-size: 0.8rem;
+}
+
+#currentYear {
+  font-weight: bold;
+  color: var(--accent);
+  font-size: 1.1rem;
+  margin: 0 5px;
 }
 
 .layout {
@@ -45,7 +56,7 @@ header h1 { margin: 0; font-size: 1.1rem; }
   gap: 18px;
   padding: 18px;
   flex: 1;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -152,15 +163,20 @@ tbody tr:hover {
   background: #fbfdff;
 }
 
-.team-badge {
+.current-phase-badge {
   display: inline-block;
   padding: 2px 8px;
-  background: var(--accent);
-  color: white;
   border-radius: 12px;
-  font-size: 0.8rem;
-  margin-left: 8px;
+  font-size: 0.7rem;
+  color: white;
+  font-weight: bold;
 }
+
+.phase-groups-badge { background: #6c757d; }
+.phase-round16-badge { background: #17a2b8; }
+.phase-quarters-badge { background: #28a745; }
+.phase-semis-badge { background: #ffc107; color: #000; }
+.phase-final-badge { background: #dc3545; }
 
 .modal {
   position: fixed;
@@ -233,6 +249,66 @@ tbody tr:hover {
   font-weight: 600;
 }
 
+/* Ganadores */
+.winners-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.winner-card {
+  padding: 12px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  text-align: center;
+}
+
+.winner-card.gold { background: linear-gradient(135deg, #fff9c4, #ffd700); }
+.winner-card.silver { background: linear-gradient(135deg, #f5f5f5, #c0c0c0); }
+.winner-card.bronze { background: linear-gradient(135deg, #f8e0c8, #cd7f32); }
+
+.winner-year {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.winner-name {
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.winner-stats {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.worldcup-card {
+  margin-top: 18px;
+}
+
+.champion-badge {
+  background: var(--gold);
+  color: #000;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  margin-left: 6px;
+  font-weight: bold;
+}
+
+.mundial-mg-cell {
+  font-weight: bold;
+  color: var(--accent);
+}
+
+.player-count {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: normal;
+}
+
 @media (max-width: 900px) {
   .layout { flex-direction: column; }
   .controls { width: 100%; order: 2; }
@@ -247,5 +323,23 @@ tbody tr:hover {
   
   .player-selection {
     gap: 4px;
+  }
+  
+  .winners-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .match-teams {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  table {
+    font-size: 0.85rem;
+  }
+  
+  thead th, tbody td {
+    padding: 8px 4px;
   }
 }
