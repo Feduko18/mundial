@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mundial Individual - Clasificación por Personas</title>
+  <title>Torneo — Partidos 5 vs 5</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
-    <h1>Mundial Individual — Clasificación por Personas</h1>
+    <h1>Torneo — Partidos 5 vs 5</h1>
     <div class="header-right">
       <span id="modeBadge">Modo: Público</span>
       <button id="loginBtn">Ingresar admin</button>
@@ -17,89 +17,92 @@
 
   <main class="layout">
     <aside class="controls">
-      <section class="card">
-        <h2>Temporada</h2>
-        <label>Año
-          <select id="yearSelect"></select>
-        </label>
-        <label>Fase
-          <select id="phaseSelect">
-            <option value="phase1">Fase 1 (ene-jun)</option>
-            <option value="phase2">Fase 2 (jul-dic)</option>
-            <option value="global">Global anual</option>
-          </select>
-        </label>
-      </section>
-
       <section class="card admin-only" id="adminPanel">
-        <h2>Panel Admin</h2>
+        <h2>Panel Administrador</h2>
 
-        <div class="form-row">
-          <input id="playerName" placeholder="Nombre jugador" />
-          <button id="addPlayerBtn">Añadir</button>
+        <!-- Agregar Jugador -->
+        <div class="form-column">
+          <h3>Agregar Jugador</h3>
+          <input id="playerName" placeholder="Nombre del jugador" />
+          <button id="addPlayerBtn">Agregar jugador</button>
         </div>
 
-        <div class="form-row">
-          <button id="generateBracketBtn">Generar bracket (16 jugadores)</button>
-          <button id="resetBracketBtn">Resetear bracket</button>
+        <!-- Crear Partido 5 vs 5 -->
+        <div class="form-column">
+          <h3>Crear Partido 5 vs 5</h3>
+          
+          <div class="team-section">
+            <h4>Equipo 1</h4>
+            <div class="player-selection">
+              <select class="team-player" data-team="1"></select>
+              <select class="team-player" data-team="1"></select>
+              <select class="team-player" data-team="1"></select>
+              <select class="team-player" data-team="1"></select>
+              <select class="team-player" data-team="1"></select>
+            </div>
+          </div>
+
+          <div class="team-section">
+            <h4>Equipo 2</h4>
+            <div class="player-selection">
+              <select class="team-player" data-team="2"></select>
+              <select class="team-player" data-team="2"></select>
+              <select class="team-player" data-team="2"></select>
+              <select class="team-player" data-team="2"></select>
+              <select class="team-player" data-team="2"></select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <button id="team1WonBtn">Ganó Equipo 1</button>
+            <button id="team2WonBtn">Ganó Equipo 2</button>
+          </div>
         </div>
 
-        <div class="form-row">
-          <button id="finalizeBtn" class="danger">Finalizar torneo (otorga título)</button>
+        <!-- Gestión de Datos -->
+        <div class="form-column">
+          <h3>Gestión de Datos</h3>
+          <div class="form-row">
+            <button id="exportBtn">Exportar datos</button>
+            <input type="file" id="importBtn" accept=".json" style="display:none">
+            <button onclick="document.getElementById('importBtn').click()">Importar datos</button>
+          </div>
+          <div class="form-row">
+            <button id="resetAllBtn" class="danger">Resetear todo</button>
+          </div>
         </div>
       </section>
 
       <section class="card">
-        <h2>Acciones</h2>
-        <div class="form-row">
-          <button id="exportBtn">Exportar JSON</button>
-          <input type="file" id="importFile" accept="application/json" style="display:none">
-          <button id="importBtn">Importar JSON</button>
-        </div>
-        <div class="form-row">
-          <button id="resetAllBtn" class="danger">Resetear TODO</button>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>Info</h2>
-        <p>Mínimo 16 jugadores para generar bracket. Password admin fija: <code>admin123</code>.</p>
+        <h2>Información</h2>
+        <p>Los partidos son 5 vs 5. Seleccioná 5 jugadores para cada equipo.</p>
+        <p>Solo los administradores pueden registrar nuevos partidos.</p>
       </section>
     </aside>
 
     <section class="content">
-      <div class="top-row">
-        <div class="card standingsCard">
-          <h2 id="standingsTitle">Tabla — Fase 1</h2>
-          <table id="standingsTable">
-            <thead>
-              <tr><th>#</th><th>Jugador</th><th>PJ</th><th>PG</th><th>PP</th><th>SF</th><th>F</th><th>FG</th><th>Títulos</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-
-        <div class="card detailCard">
-          <h2>Detalle jugador</h2>
-          <div id="playerDetail" class="player-detail">
-            <p>Seleccioná un jugador en la tabla para ver detalle.</p>
-          </div>
-        </div>
+      <!-- Tabla de Jugadores -->
+      <div class="card standingsCard">
+        <h2>Tabla de Posiciones - Jugadores</h2>
+        <table id="playersTable">
+          <thead>
+            <tr>
+              <th>#</th><th>Jugador</th><th>PJ</th><th>PG</th><th>PP</th><th>Puntos</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
 
-      <div class="card bracketCard">
-        <h2>Bracket Actual <small id="bracketInfo"></small></h2>
-        <div id="bracket" class="bracket"></div>
-      </div>
-
+      <!-- Historial -->
       <div class="card historyCard">
-        <h2>Historial de Torneos (campeones)</h2>
+        <h2>Historial de Partidos</h2>
         <ul id="historyList"></ul>
       </div>
     </section>
   </main>
 
-  <!-- Login modal simple -->
+  <!-- Modal para ingreso admin -->
   <div id="loginModal" class="modal hidden">
     <div class="modal-content">
       <h3>Ingreso Administrador</h3>
@@ -108,12 +111,11 @@
         <button id="loginSubmit">Ingresar</button>
         <button id="loginCancel">Cancelar</button>
       </div>
-      <small>Contraseña fija en código: <code>admin123</code></small>
     </div>
   </div>
 
   <footer>
-    <small>Minimal — demo local. Para producción usar backend y autenticación real.</small>
+    <small>Sistema de gestión de torneos 5 vs 5 — Datos locales</small>
   </footer>
 
   <script src="script.js"></script>
