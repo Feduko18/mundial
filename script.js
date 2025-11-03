@@ -9,8 +9,8 @@ const MIN_YEAR = 2025;
 
 // Jugadores predeterminados (incluyendo Fandiño)
 const DEFAULT_PLAYERS = [
-  'Cajote', 'Fede', 'Juanse', 'Lauti', 'Salvati',
-  'Palat', 'Pela', 'Ger', 'Girbal', 'Samo', 'Visco', 'Ziegler', 'Fandiño'
+'Cajote', 'Fandiño', 'Fede', 'Ger', 'Girbal', 'Juanse', 'Lauti', 'Palat', 'Pela', 'Salvati', 'Samo', 'Visco', 'Ziegler'
+
 ];
 
 let isAdmin = false;
@@ -550,4 +550,5 @@ function renderWinners() {
   if (winnersList.children.length === 0) {
     winnersList.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No hay campeones registrados</div>';
   }
+
 }
