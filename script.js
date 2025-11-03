@@ -446,7 +446,7 @@ function renderPlayersTable() {
   }
 
   // Ordenar por Mundial MG (partidos ganados en eliminatorias) y luego por puntos
-  players.sort((a, b) => b.mundialMG - a.mundialMG || b.pts - a.pts || b.pg - a.pg || a.pp - b.pp);
+  players.sort((a, b) => b.mundialMG - a.mundialMG || b.pts - a.pts || b.pg - a.pg || a.pp - b.pp || a.name.localeCompare(b.name));
 
   // Actualizar título con cantidad de jugadores
   document.querySelector('.standingsCard h2').innerHTML = 
@@ -552,3 +552,4 @@ function renderWinners() {
   }
 
 }
+
