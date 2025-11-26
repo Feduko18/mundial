@@ -172,7 +172,8 @@ tbody tr:hover {
   font-weight: bold;
 }
 
-.phase-groups-badge { background: #6c757d; }
+.phase-groups1-badge { background: #9ca3a9; }
+.phase-groups2-badge { background: #5a6268; }
 .phase-round16-badge { background: #17a2b8; }
 .phase-quarters-badge { background: #28a745; }
 .phase-semis-badge { background: #ffc107; color: #000; }

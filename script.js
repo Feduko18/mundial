@@ -3,6 +3,11 @@
    Guarda datos en localStorage.
 */
 
+/* Sistema de torneos anuales con sistema de ascensos.
+   Admin password: "admin123"
+   Guarda datos en localStorage.
+*/
+
 const ADMIN_PASS = 'admin123';
 const LS_KEY = 'torneo_ascensos_v3';
 const MIN_YEAR = 2025;
@@ -10,7 +15,6 @@ const MIN_YEAR = 2025;
 // Jugadores predeterminados (incluyendo Fandiño)
 const DEFAULT_PLAYERS = [
 'Cajote', 'Fandiño', 'Fede', 'Ger', 'Girbal', 'Juanse', 'Lauti', 'Palat', 'Pela', 'Salvati', 'Samo', 'Visco', 'Ziegler'
-
 ];
 
 let isAdmin = false;
@@ -40,6 +44,7 @@ const team2WonBtn = document.getElementById('team2WonBtn');
 const exportBtn = document.getElementById('exportBtn');
 const importBtn = document.getElementById('importBtn');
 const resetYearBtn = document.getElementById('resetYearBtn');
+const importPublicBtn = document.getElementById('importPublicBtn');
 
 const playersTableBody = document.querySelector('#playersTable tbody');
 const historyList = document.getElementById('historyList');
@@ -76,6 +81,7 @@ function initUI() {
   team2WonBtn.onclick = () => recordMatch(2);
   exportBtn.onclick = exportData;
   importBtn.onchange = importData;
+  importPublicBtn.onchange = importData; // Nueva línea para el botón público
   
   resetYearBtn.onclick = () => {
     if (confirm(`¿Seguro que querés resetear todos los datos del ${currentYear}?`)) {
@@ -142,7 +148,7 @@ function loadState() {
       [MIN_YEAR]: {
         players: {},
         matches: [],
-        champion: null
+        champions: [] // Ahora es un array para múltiples campeones
       }
     }
   };
@@ -165,7 +171,7 @@ function getCurrentYearData() {
     state.years[currentYear] = {
       players: {},
       matches: [],
-      champion: null
+      champions: [] // Ahora es un array para múltiples campeones
     };
     
     // Agregar jugadores predeterminados al nuevo año
@@ -185,8 +191,8 @@ function createNewPlayer(name) {
     name: name,
     pj: 0, pg: 0, pp: 0, pts: 0,
     mundialMG: 0,
-    currentPhase: 'groups',
-    bestPhase: 'groups'
+    currentPhase: 'groups1', // Todos empiezan en Grupos 1
+    bestPhase: 'groups1'
   };
 }
 
@@ -204,6 +210,63 @@ function addPlayer() {
   playerNameInput.value = '';
   renderAll();
   alert(`Jugador "${name}" agregado al ${currentYear}`);
+}
+
+// ---------- Funciones auxiliares de fases ----------
+function getNextPhase(currentPhase) {
+  const phases = ['groups1', 'groups2', 'round16', 'quarters', 'semis', 'final'];
+  const currentIndex = phases.indexOf(currentPhase);
+  return phases[currentIndex + 1] || null;
+}
+
+function getPhaseValue(phase) {
+  const values = {
+    'groups1': 1,
+    'groups2': 2,
+    'round16': 3,
+    'quarters': 4,
+    'semis': 5,
+    'final': 6
+  };
+  return values[phase] || 0;
+}
+
+function getPhaseFromValue(value) {
+  const phases = {
+    1: 'groups1',
+    2: 'groups2',
+    3: 'round16',
+    4: 'quarters',
+    5: 'semis',
+    6: 'final'
+  };
+  return phases[value] || 'groups1';
+}
+
+function getPhaseName(phase) {
+  const names = {
+    'groups1': 'Fase de Grupos 1',
+    'groups2': 'Fase de Grupos 2',
+    'round16': 'Octavos',
+    'quarters': 'Cuartos',
+    'semis': 'Semifinal',
+    'final': 'Final'
+  };
+  return names[phase] || phase;
+}
+
+// ---------- Obtener jugadores seleccionados ----------
+function getSelectedPlayers(teamNumber) {
+  const selects = document.querySelectorAll(`.team-player[data-team="${teamNumber}"]`);
+  const players = [];
+  
+  selects.forEach(select => {
+    if (select.value) {
+      players.push(select.value);
+    }
+  });
+  
+  return players;
 }
 
 // ---------- Registrar partido con sistema de ascensos ----------
@@ -230,15 +293,15 @@ function recordMatch(winningTeam) {
 
   const yearData = getCurrentYearData();
 
-  // Determinar la fase del partido (la fase más avanzada entre los jugadores)
+  // Determinar la fase del partido (la fase más avanzada entre los jugadores) solo para el historial
   const phases = allPlayers.map(playerName => {
     const player = yearData.players[playerName];
     return getPhaseValue(player.currentPhase);
   });
   const maxPhaseValue = Math.max(...phases);
-  const currentPhase = getPhaseFromValue(maxPhaseValue);
+  const matchPhase = getPhaseFromValue(maxPhaseValue);
 
-  console.log('Fase del partido:', currentPhase, 'de jugadores:', allPlayers);
+  console.log('Fase del partido (historial):', matchPhase, 'de jugadores:', allPlayers);
 
   // Actualizar estadísticas básicas de todos los jugadores
   allPlayers.forEach(playerName => {
@@ -246,45 +309,48 @@ function recordMatch(winningTeam) {
     player.pj++;
   });
 
-  // Para el equipo ganador
+  // Para el equipo ganador - CADA JUGADOR AVANZA INDIVIDUALMENTE
   const winningPlayers = winningTeam === 1 ? team1Players : team2Players;
   winningPlayers.forEach(playerName => {
     const player = yearData.players[playerName];
     player.pg++;
     player.pts += 3;
 
-    // Sistema de ascensos - solo en fases eliminatorias
-    if (currentPhase !== 'groups') {
-      player.mundialMG++;  // Contar partido ganado en fase eliminatoria
+    // INCREMENTAR MG si está en fase eliminatoria (a partir de round16)
+    if (getPhaseValue(player.currentPhase) >= getPhaseValue('round16')) {
+      player.mundialMG++;
     }
 
-    // AVANZAR DE FASE (siempre que no sea la final)
-    const nextPhase = getNextPhase(currentPhase);
+    // AVANZAR DE FASE INDIVIDUALMENTE (siempre que no sea la final)
+    const nextPhase = getNextPhase(player.currentPhase);
     if (nextPhase) {
       player.currentPhase = nextPhase;
-      console.log(`${playerName} avanza de ${currentPhase} a ${nextPhase}`);
+      console.log(`${playerName} avanza de ${player.currentPhase} a ${nextPhase}`);
       
       // Actualizar mejor fase si es mejor que la actual
       if (getPhaseValue(nextPhase) > getPhaseValue(player.bestPhase)) {
         player.bestPhase = nextPhase;
       }
-    } else if (currentPhase === 'final') {
-      // Si es la final y ganó, es el campeón
-      yearData.champion = playerName;
-      console.log(`${playerName} es el campeón del ${currentYear}`);
+    } else if (player.currentPhase === 'final') {
+      // Si es la final y ganó, es campeón y vuelve a Grupos 1
+      if (!yearData.champions) yearData.champions = [];
+      yearData.champions.push(playerName);
+      player.mundialMG++; // Sumar MG por ganar la final
+      player.currentPhase = 'groups1'; // Volver a Grupos 1
+      console.log(`${playerName} es CAMPEÓN del ${currentYear} y vuelve a Grupos 1`);
     }
   });
 
-  // Para el equipo perdedor - VOLVER A FASE DE GRUPOS si estaba en eliminatoria
+  // Para el equipo perdedor - CADA JUGADOR VUELVE A GRUPOS 1 si está en Grupos 2 o superior
   const losingPlayers = winningTeam === 1 ? team2Players : team1Players;
   losingPlayers.forEach(playerName => {
     const player = yearData.players[playerName];
     player.pp++;
     
-    // Volver a fase de grupos si pierde en fase eliminatoria
-    if (currentPhase !== 'groups') {
-      player.currentPhase = 'groups';
-      console.log(`${playerName} vuelve a grupos`);
+    // Volver a fase de grupos 1 si pierde en Grupos 2 o cualquier fase superior
+    if (getPhaseValue(player.currentPhase) >= getPhaseValue('groups2')) {
+      player.currentPhase = 'groups1';
+      console.log(`${playerName} vuelve a Grupos 1 por perder en ${player.currentPhase}`);
     }
   });
 
@@ -293,7 +359,7 @@ function recordMatch(winningTeam) {
     team1: team1Players,
     team2: team2Players,
     winner: winningTeam,
-    phase: currentPhase,
+    phase: matchPhase, // Fase del partido para el historial
     date: new Date().toISOString()
   });
 
@@ -302,78 +368,35 @@ function recordMatch(winningTeam) {
   
   const winnerText = winningTeam === 1 ? 'Equipo 1' : 'Equipo 2';
   const phaseNames = {
-    groups: 'Fase de Grupos',
+    groups1: 'Fase de Grupos 1',
+    groups2: 'Fase de Grupos 2', 
     round16: 'Octavos de Final',
     quarters: 'Cuartos de Final',
     semis: 'Semifinales',
     final: 'Final'
   };
   
-  let message = `Partido de ${phaseNames[currentPhase]} registrado\n`;
+  let message = `Partido de ${phaseNames[matchPhase]} registrado\n`;
   message += `Ganó: ${winnerText}\n\n`;
-  
-  if (currentPhase !== 'groups') {
-    message += `✅ Ganadores: +1 Mundial MG y avanzan de fase\n`;
-    message += `❌ Perdedores: vuelven a Grupos`;
-    
-    if (currentPhase === 'final') {
-      message += `\n\n🏆 ${winningPlayers[0]} es el NUEVO CAMPEÓN!`;
-    }
+
+  if (matchPhase === 'final') {
+    const newChampions = winningTeam === 1 ? team1Players : team2Players;
+    message += `🏆 ${newChampions.join(', ')} SON CAMPEONES!\n`;
+    message += `✅ Suman 1 MG y vuelven a Grupos 1\n`;
+  } else {
+    message += `✅ Ganadores: Avanzan individualmente de fase\n`;
   }
-  
+
+  message += `❌ Perdedores: Si estaban en Grupos 2 o superior, vuelven a Grupos 1`;
+
   alert(message);
-}
-
-// Obtener la siguiente fase
-function getNextPhase(currentPhase) {
-  const phases = ['groups', 'round16', 'quarters', 'semis', 'final'];
-  const currentIndex = phases.indexOf(currentPhase);
-  return phases[currentIndex + 1] || null;
-}
-
-// Valor numérico de las fases para comparación
-function getPhaseValue(phase) {
-  const values = {
-    'groups': 1,
-    'round16': 2,
-    'quarters': 3,
-    'semis': 4,
-    'final': 5
-  };
-  return values[phase] || 0;
-}
-
-// Obtener fase desde valor numérico
-function getPhaseFromValue(value) {
-  const phases = {
-    1: 'groups',
-    2: 'round16',
-    3: 'quarters',
-    4: 'semis',
-    5: 'final'
-  };
-  return phases[value] || 'groups';
-}
-
-// ---------- Obtener jugadores seleccionados ----------
-function getSelectedPlayers(teamNumber) {
-  const selects = document.querySelectorAll(`.team-player[data-team="${teamNumber}"]`);
-  const players = [];
-  
-  selects.forEach(select => {
-    if (select.value) {
-      players.push(select.value);
-    }
-  });
-  
-  return players;
 }
 
 // ---------- Exportar/Importar ----------
 function exportData() {
   const dataStr = JSON.stringify(state, null, 2);
   const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-  const exportFileDefaultName = `torneo_ascensos_${new Date().toISOString().split('T')[0]}.json`;
+  const exportFileDefaultName = `datos_del_torneo_${new Date().toISOString().split('T')[0]}.json`;
   
   const linkElement = document.createElement('a');
   linkElement.setAttribute('href', dataUri);
@@ -395,7 +418,7 @@ function importData(event) {
         throw new Error('Archivo inválido');
       }
       
-      if (confirm('¿Reemplazar todos los datos actuales con los importados?')) {
+      if (confirm('¿Reemplazar todos los datos actuales con los importados?\n\n¡Esto sobrescribirá todos los datos actuales!')) {
         state = importedState;
         saveState();
         renderAll();
@@ -407,7 +430,13 @@ function importData(event) {
   };
   
   reader.readAsText(file);
+  // Limpiar ambos inputs de importación
   event.target.value = '';
+  if (event.target !== importPublicBtn) {
+    importPublicBtn.value = '';
+  } else {
+    importBtn.value = '';
+  }
 }
 
 // ---------- Render ----------
@@ -457,7 +486,7 @@ function renderPlayersTable() {
     
     tr.innerHTML = `
       <td>${index + 1}</td>
-      <td>${player.name} ${yearData.champion === player.name ? '<span class="champion-badge">🏆</span>' : ''}</td>
+      <td>${player.name} ${yearData.champions && yearData.champions.includes(player.name) ? '<span class="champion-badge">🏆</span>' : ''}</td>
       <td>${player.pj}</td>
       <td>${player.pg}</td>
       <td>${player.pp}</td>
@@ -472,17 +501,6 @@ function renderPlayersTable() {
     
     playersTableBody.appendChild(tr);
   });
-}
-
-function getPhaseName(phase) {
-  const names = {
-    'groups': 'Grupos',
-    'round16': 'Octavos',
-    'quarters': 'Cuartos',
-    'semis': 'Semifinal',
-    'final': 'Final'
-  };
-  return names[phase] || phase;
 }
 
 function renderHistory() {
@@ -502,7 +520,8 @@ function renderHistory() {
     const date = new Date(match.date);
     const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     const phaseNames = {
-      groups: 'Grupos',
+      groups1: 'Fase de Grupos 1',
+      groups2: 'Fase de Grupos 2',
       round16: 'Octavos',
       quarters: 'Cuartos',
       semis: 'Semifinal',
@@ -534,22 +553,27 @@ function renderWinners() {
   
   years.forEach(year => {
     const yearData = state.years[year];
-    if (yearData.champion) {
-      const champion = yearData.players[yearData.champion];
-      const div = document.createElement('div');
-      div.className = 'winner-card gold';
-      div.innerHTML = `
-        <div class="winner-year">${year}</div>
-        <div class="winner-name">🏆 ${champion.name}</div>
-        <div class="winner-stats">${champion.pg} PG • ${champion.pts} Pts • ${champion.mundialMG} MG</div>
-      `;
-      winnersList.appendChild(div);
+    if (yearData.champions && yearData.champions.length > 0) {
+      // Para cada campeón del año, crear una tarjeta
+      yearData.champions.forEach(championName => {
+        const champion = yearData.players[championName];
+        const div = document.createElement('div');
+        div.className = 'winner-card gold';
+        div.innerHTML = `
+          <div class="winner-year">${year}</div>
+          <div class="winner-name">🏆 ${champion.name}</div>
+          <div class="winner-stats">${champion.pg} PG • ${champion.pts} Pts • ${champion.mundialMG} MG</div>
+        `;
+        winnersList.appendChild(div);
+      });
     }
   });
   
   if (winnersList.children.length === 0) {
     winnersList.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No hay campeones registrados</div>';
   }
-
+window.importDataGlobal = function() {
+  // Simular click en el input de importación
+  importBtn.click();
+};
 }
-
