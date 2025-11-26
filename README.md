@@ -29,5 +29,3 @@ Sistema web para gestionar torneos anuales de fútbol con un innovador sistema d
 3. **Perdes en desde Fase De Grupos 2** = Volves a  Fase De Grupos 1
 4. **Ganas la Final** = Se registra en el historial del año
 5. **MG** = Partidos ganados en fases eliminatorias
-
-## 📁 Estructura
