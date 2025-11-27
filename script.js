@@ -71,7 +71,6 @@ const team2WonBtn = document.getElementById('team2WonBtn');
 const exportBtn = document.getElementById('exportBtn');
 const importBtn = document.getElementById('importBtn');
 const resetYearBtn = document.getElementById('resetYearBtn');
-const importPublicBtn = document.getElementById('importPublicBtn');
 
 const playersTableBody = document.querySelector('#playersTable tbody');
 const historyList = document.getElementById('historyList');
@@ -108,7 +107,6 @@ function initUI() {
   team2WonBtn.onclick = () => recordMatch(2);
   exportBtn.onclick = exportData;
   importBtn.onchange = importData;
-  importPublicBtn.onchange = importData;
   
   resetYearBtn.onclick = () => {
     if (confirm(`¿Seguro que querés resetear todos los datos del ${currentYear}?`)) {
@@ -427,13 +425,8 @@ function importData(event) {
   };
   
   reader.readAsText(file);
-  // Limpiar ambos inputs de importación
+  // Limpiar solo el input de importación
   event.target.value = '';
-  if (event.target !== importPublicBtn) {
-    importPublicBtn.value = '';
-  } else {
-    importBtn.value = '';
-  }
 }
 
 // ---------- Render ----------
@@ -569,9 +562,4 @@ function renderWinners() {
   if (winnersList.children.length === 0) {
     winnersList.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No hay campeones registrados</div>';
   }
-}
-
-// Función global para importar datos
-window.importDataGlobal = function() {
-  importBtn.click();
 };
