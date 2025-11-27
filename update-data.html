@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Actualizar Datos del Torneo</title>
+    <style>
+        textarea { width: 100%; height: 400px; margin: 10px 0; }
+        button { padding: 10px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Generador de Actualizaciones</h1>
+    
+    <div>
+        <h3>Estado Actual:</h3>
+        <textarea id="currentData"></textarea>
+        <button onclick="loadCurrentData()">Cargar Datos Actuales</button>
+    </div>
+    
+    <div>
+        <h3>Acciones Rápidas:</h3>
+        <button onclick="addMatch()">Agregar Partido</button>
+        <button onclick="addPlayer()">Agregar Jugador</button>
+        <button onclick="resetYear()">Resetear Año</button>
+    </div>
+    
+    <div>
+        <h3>Nuevo data.js:</h3>
+        <textarea id="newData"></textarea>
+        <button onclick="copyToClipboard()">Copiar al Portapapeles</button>
+        <button onclick="downloadDataJS()">Descargar data.js</button>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        function loadCurrentData() {
+            document.getElementById('currentData').value = JSON.stringify(window.torneoData, null, 2);
+            generateNewData();
+        }
+        
+        function generateNewData() {
+            const newData = `// data.js - Datos estáticos del torneo
+window.torneoData = ${JSON.stringify(window.torneoData, null, 2)};`;
+            document.getElementById('newData').value = newData;
+        }
+        
+        function copyToClipboard() {
+            const textarea = document.getElementById('newData');
+            textarea.select();
+            document.execCommand('copy');
+            alert('Copiado al portapapeles!');
+        }
+        
+        function downloadDataJS() {
+            const content = document.getElementById('newData').value;
+            const blob = new Blob([content], { type: 'application/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'data.js';
+            a.click();
+        }
+        
+        // Funciones de modificación (simplificadas)
+        function addMatch() {
+            // Aquí implementarías la lógica para agregar un partido
+            // Similar a recordMatch pero actualizando window.torneoData directamente
+            alert("Implementar lógica para agregar partido");
+            generateNewData();
+        }
+        
+        function addPlayer() {
+            const name = prompt("Nombre del nuevo jugador:");
+            if (name) {
+                window.torneoData.years[window.torneoData.currentYear].players[name] = {
+                    pj: 0, pg: 0, pp: 0, pts: 0,
+                    mundialMG: 0,
+                    currentPhase: "groups1",
+                    bestPhase: "groups1"
+                };
+                generateNewData();
+            }
+        }
+        
+        function resetYear() {
+            if (confirm("¿Resetear año actual?")) {
+                const year = window.torneoData.currentYear;
+                window.torneoData.years[year] = {
+                    players: {},
+                    matches: [],
+                    champions: []
+                };
+                generateNewData();
+            }
+        }
+        
+        // Cargar datos al iniciar
+        loadCurrentData();
+    </script>
+</body>
+</html>

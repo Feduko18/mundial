@@ -7,9 +7,12 @@
    Admin password: "admin123"
    Guarda datos en localStorage.
 */
+/* Sistema de torneos anuales con sistema de ascensos - Versión Estática
+   Admin password: "admin123"
+   Los datos se cargan desde data.js y se exportan para actualizar el repositorio
+*/
 
 const ADMIN_PASS = 'admin123';
-const LS_KEY = 'torneo_ascensos_v3';
 const MIN_YEAR = 2025;
 
 // Jugadores predeterminados (incluyendo Fandiño)
@@ -20,7 +23,31 @@ const DEFAULT_PLAYERS = [
 let isAdmin = false;
 let currentYear = new Date().getFullYear();
 if (currentYear < MIN_YEAR) currentYear = MIN_YEAR;
-let state = loadState();
+
+// Cargar estado desde datos estáticos
+let state = window.torneoData;
+
+// Si no hay datos, crear estado inicial con jugadores
+if (!state || !state.years || !state.years[2025] || Object.keys(state.years[2025].players).length === 0) {
+  state = {
+    currentYear: 2025,
+    years: {
+      2025: {
+        players: {},
+        matches: [],
+        champions: []
+      }
+    }
+  };
+  
+  // Agregar jugadores predeterminados
+  const yearData = state.years[2025];
+  DEFAULT_PLAYERS.forEach(playerName => {
+    yearData.players[playerName] = createNewPlayer(playerName);
+  });
+  
+  console.log("Jugadores creados manualmente:", Object.keys(yearData.players));
+}
 
 // Elementos de UI
 const loginBtn = document.getElementById('loginBtn');
@@ -81,7 +108,7 @@ function initUI() {
   team2WonBtn.onclick = () => recordMatch(2);
   exportBtn.onclick = exportData;
   importBtn.onchange = importData;
-  importPublicBtn.onchange = importData; // Nueva línea para el botón público
+  importPublicBtn.onchange = importData;
   
   resetYearBtn.onclick = () => {
     if (confirm(`¿Seguro que querés resetear todos los datos del ${currentYear}?`)) {
@@ -113,9 +140,8 @@ function updateYearDisplay() {
 function resetCurrentYear() {
   if (state.years[currentYear]) {
     delete state.years[currentYear];
-    saveState();
     renderAll();
-    alert(`Datos del ${currentYear} reseteados`);
+    alert(`Datos del ${currentYear} reseteados (solo en esta sesión)`);
   }
 }
 
@@ -138,40 +164,12 @@ function setAdminMode(val) {
 }
 
 // ---------- Estado ----------
-function loadState() {
-  const s = localStorage.getItem(LS_KEY);
-  if (s) return JSON.parse(s);
-  
-  // Estado inicial con jugadores predeterminados
-  const initialState = { 
-    years: {
-      [MIN_YEAR]: {
-        players: {},
-        matches: [],
-        champions: [] // Ahora es un array para múltiples campeones
-      }
-    }
-  };
-  
-  // Agregar jugadores predeterminados al año inicial
-  const yearData = initialState.years[MIN_YEAR];
-  DEFAULT_PLAYERS.forEach(playerName => {
-    yearData.players[playerName] = createNewPlayer(playerName);
-  });
-  
-  return initialState;
-}
-
-function saveState() {
-  localStorage.setItem(LS_KEY, JSON.stringify(state));
-}
-
 function getCurrentYearData() {
   if (!state.years[currentYear]) {
     state.years[currentYear] = {
       players: {},
       matches: [],
-      champions: [] // Ahora es un array para múltiples campeones
+      champions: []
     };
     
     // Agregar jugadores predeterminados al nuevo año
@@ -179,8 +177,6 @@ function getCurrentYearData() {
     DEFAULT_PLAYERS.forEach(playerName => {
       yearData.players[playerName] = createNewPlayer(playerName);
     });
-    
-    saveState();
   }
   return state.years[currentYear];
 }
@@ -191,7 +187,7 @@ function createNewPlayer(name) {
     name: name,
     pj: 0, pg: 0, pp: 0, pts: 0,
     mundialMG: 0,
-    currentPhase: 'groups1', // Todos empiezan en Grupos 1
+    currentPhase: 'groups1',
     bestPhase: 'groups1'
   };
 }
@@ -206,10 +202,9 @@ function addPlayer() {
   // Crear jugador para el año actual
   yearData.players[name] = createNewPlayer(name);
   
-  saveState();
   playerNameInput.value = '';
   renderAll();
-  alert(`Jugador "${name}" agregado al ${currentYear}`);
+  alert(`Jugador "${name}" agregado al ${currentYear} (cambios locales)`);
 }
 
 // ---------- Funciones auxiliares de fases ----------
@@ -359,11 +354,10 @@ function recordMatch(winningTeam) {
     team1: team1Players,
     team2: team2Players,
     winner: winningTeam,
-    phase: matchPhase, // Fase del partido para el historial
+    phase: matchPhase,
     date: new Date().toISOString()
   });
 
-  saveState();
   renderAll();
   
   const winnerText = winningTeam === 1 ? 'Equipo 1' : 'Equipo 2';
@@ -387,21 +381,25 @@ function recordMatch(winningTeam) {
     message += `✅ Ganadores: Avanzan individualmente de fase\n`;
   }
 
-  message += `❌ Perdedores: Si estaban en Grupos 2 o superior, vuelven a Grupos 1`;
+  message += `❌ Perdedores: Si estaban en Grupos 2 o superior, vuelven a Grupos 1\n\n`;
+  message += `⚠️ Cambios locales - Exportá data.js para hacerlos permanentes`;
 
   alert(message);
 }
 
 // ---------- Exportar/Importar ----------
 function exportData() {
-  const dataStr = JSON.stringify(state, null, 2);
-  const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-  const exportFileDefaultName = `datos_del_torneo_${new Date().toISOString().split('T')[0]}.json`;
+  const dataJS = `// data.js - Datos estáticos del torneo
+window.torneoData = ${JSON.stringify(state, null, 2)};`;
   
-  const linkElement = document.createElement('a');
-  linkElement.setAttribute('href', dataUri);
-  linkElement.setAttribute('download', exportFileDefaultName);
-  linkElement.click();
+  const blob = new Blob([dataJS], { type: 'application/javascript' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'data.js';
+  a.click();
+  
+  alert('data.js generado. Reemplazá el archivo en tu repositorio y hacé commit para actualizar la web.');
 }
 
 function importData(event) {
@@ -418,11 +416,10 @@ function importData(event) {
         throw new Error('Archivo inválido');
       }
       
-      if (confirm('¿Reemplazar todos los datos actuales con los importados?\n\n¡Esto sobrescribirá todos los datos actuales!')) {
+      if (confirm('¿Reemplazar todos los datos actuales con los importados?\n\n¡Esto sobrescribirá todos los datos actuales en esta sesión!')) {
         state = importedState;
-        saveState();
         renderAll();
-        alert('Datos importados correctamente');
+        alert('Datos importados correctamente (solo en esta sesión)');
       }
     } catch (error) {
       alert('Error al importar datos: Archivo corrupto o formato incorrecto');
@@ -572,8 +569,9 @@ function renderWinners() {
   if (winnersList.children.length === 0) {
     winnersList.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No hay campeones registrados</div>';
   }
+}
+
+// Función global para importar datos
 window.importDataGlobal = function() {
-  // Simular click en el input de importación
   importBtn.click();
 };
-}
