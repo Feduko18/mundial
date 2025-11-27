@@ -173,7 +173,7 @@ window.torneoData = {
           ],
           "winner": 1,
           "phase": "groups1",
-          "date": "2025-11-20T20:25:04.966Z"
+          "date": "2025-11-20T23:00:00.000Z"
         },
         {
           "team1": [
@@ -192,7 +192,7 @@ window.torneoData = {
           ],
           "winner": 2,
           "phase": "groups2",
-          "date": "2025-11-26T20:28:26.889Z"
+          "date": "2025-11-26T01:00:00.000Z"
         }
       ],
       "champions": []
