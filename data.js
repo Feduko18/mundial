@@ -6,9 +6,9 @@ window.torneoData = {
       "players": {
         "Cajote": {
           "name": "Cajote",
-          "pj": 1,
+          "pj": 2,
           "pg": 0,
-          "pp": 1,
+          "pp": 2,
           "pts": 0,
           "mundialMG": 0,
           "currentPhase": "groups1",
@@ -16,22 +16,22 @@ window.torneoData = {
         },
         "Fandiño": {
           "name": "Fandiño",
-          "pj": 1,
-          "pg": 1,
+          "pj": 2,
+          "pg": 2,
           "pp": 0,
-          "pts": 3,
+          "pts": 6,
           "mundialMG": 0,
-          "currentPhase": "groups2",
-          "bestPhase": "groups2"
+          "currentPhase": "round16",
+          "bestPhase": "round16"
         },
         "Fede": {
           "name": "Fede",
-          "pj": 2,
-          "pg": 1,
+          "pj": 3,
+          "pg": 2,
           "pp": 1,
-          "pts": 3,
+          "pts": 6,
           "mundialMG": 0,
-          "currentPhase": "groups1",
+          "currentPhase": "groups2",
           "bestPhase": "groups2"
         },
         "Fran Briones": {
@@ -56,9 +56,9 @@ window.torneoData = {
         },
         "Girbal": {
           "name": "Girbal",
-          "pj": 2,
+          "pj": 3,
           "pg": 0,
-          "pp": 2,
+          "pp": 3,
           "pts": 0,
           "mundialMG": 0,
           "currentPhase": "groups1",
@@ -76,13 +76,13 @@ window.torneoData = {
         },
         "Lauti": {
           "name": "Lauti",
-          "pj": 1,
-          "pg": 0,
+          "pj": 2,
+          "pg": 1,
           "pp": 1,
-          "pts": 0,
+          "pts": 3,
           "mundialMG": 0,
-          "currentPhase": "groups1",
-          "bestPhase": "groups1"
+          "currentPhase": "groups2",
+          "bestPhase": "groups2"
         },
         "Palat": {
           "name": "Palat",
@@ -106,19 +106,19 @@ window.torneoData = {
         },
         "Pela": {
           "name": "Pela",
-          "pj": 2,
-          "pg": 1,
+          "pj": 3,
+          "pg": 2,
           "pp": 1,
-          "pts": 3,
+          "pts": 6,
           "mundialMG": 0,
-          "currentPhase": "groups2",
-          "bestPhase": "groups2"
+          "currentPhase": "round16",
+          "bestPhase": "round16"
         },
         "Salvati": {
           "name": "Salvati",
-          "pj": 2,
+          "pj": 3,
           "pg": 0,
-          "pp": 2,
+          "pp": 3,
           "pts": 0,
           "mundialMG": 0,
           "currentPhase": "groups1",
@@ -126,22 +126,22 @@ window.torneoData = {
         },
         "Samo": {
           "name": "Samo",
-          "pj": 1,
-          "pg": 1,
-          "pp": 0,
-          "pts": 3,
-          "mundialMG": 0,
-          "currentPhase": "groups2",
-          "bestPhase": "groups2"
-        },
-        "Visco": {
-          "name": "Visco",
           "pj": 2,
           "pg": 2,
           "pp": 0,
           "pts": 6,
           "mundialMG": 0,
           "currentPhase": "round16",
+          "bestPhase": "round16"
+        },
+        "Visco": {
+          "name": "Visco",
+          "pj": 3,
+          "pg": 2,
+          "pp": 1,
+          "pts": 6,
+          "mundialMG": 0,
+          "currentPhase": "groups1",
           "bestPhase": "round16"
         },
         "Ziegler": {
@@ -153,6 +153,16 @@ window.torneoData = {
           "mundialMG": 0,
           "currentPhase": "round16",
           "bestPhase": "round16"
+        },
+        "Maxi": {
+          "name": "Maxi",
+          "pj": 1,
+          "pg": 0,
+          "pp": 1,
+          "pts": 0,
+          "mundialMG": 0,
+          "currentPhase": "groups1",
+          "bestPhase": "groups1"
         }
       },
       "matches": [
@@ -193,6 +203,25 @@ window.torneoData = {
           "winner": 2,
           "phase": "groups2",
           "date": "2025-11-26T01:00:00.000Z"
+        },
+        {
+          "team1": [
+            "Fandiño",
+            "Fede",
+            "Pela",
+            "Samo",
+            "Lauti"
+          ],
+          "team2": [
+            "Maxi",
+            "Visco",
+            "Cajote",
+            "Girbal",
+            "Salvati"
+          ],
+          "winner": 1,
+          "phase": "round16",
+          "date": "2025-12-03T00:08:58.839Z"
         }
       ],
       "champions": []
